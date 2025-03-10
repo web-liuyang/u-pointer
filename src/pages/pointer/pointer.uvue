@@ -1,0 +1,134 @@
+<script lang="ts" setup>
+import { computed, reactive } from "vue";
+import {
+	Pointer,
+	PointerclickEvent,
+	PointerwheelEvent,
+	PointerdownEvent,
+	PointermoveEvent,
+	PointerupEvent,
+	globalPointer,
+} from "@/uni_modules/u-pointer";
+
+const pointerMap = reactive({
+	local: new Map<number, Pointer>(),
+	global: new Map<number, Pointer>(),
+});
+
+const localPointers = computed(() => [...pointerMap.local.values()]);
+const globalPointers = computed(() => [...pointerMap.global.values()]);
+
+function pointerdown(e: PointerdownEvent) {
+	console.log("pointerdown");
+	pointerMap.local.set(e.pointer.id, e.pointer);
+}
+
+function pointermove(e: PointermoveEvent) {
+	console.log("pointermove", e.pointer.id);
+	pointerMap.local.set(e.pointer.id, e.pointer);
+}
+
+function pointerup(e: PointerupEvent) {
+	console.log("pointerup", e.pointer.id);
+	pointerMap.local.delete(e.pointer.id);
+}
+
+function pointerclick(e: PointerclickEvent) {
+	console.log("pointerclick", e.pointer.id);
+}
+
+function pointerwheel(e: PointerwheelEvent) {
+	console.log("pointerwheel", e.pointer.id, e.direction);
+}
+
+globalPointer.addEventListener("onpointerdown", e => {
+	console.log("root pointerdown", e.pointer.id);
+	pointerMap.global.set(e.pointer.id, e.pointer);
+});
+
+globalPointer.addEventListener("onpointermove", e => {
+	console.log("root onpointermove", e.pointer.id);
+	pointerMap.global.set(e.pointer.id, e.pointer);
+});
+
+globalPointer.addEventListener("onpointerup", async e => {
+	console.log("root pointerup", e.pointer.id);
+	pointerMap.global.delete(e.pointer.id);
+});
+
+globalPointer.addEventListener("onpointerclick", e => {
+	console.log("root pointerclick", e.pointer.id);
+});
+
+globalPointer.addEventListener("onpointerwheel", e => {
+	console.log("root pointerwheel", e.pointer.id, e.direction);
+});
+
+function normalizeNumber(value: number): string {
+	return value.toFixed(2);
+}
+</script>
+
+<template>
+	<view class="w-100 h-100">
+		<u-pointer-root>
+			<view>
+				<u-pointer
+					class="rect"
+					@onpointerclick="pointerclick"
+					@onpointerdown="pointerdown"
+					@onpointermove="pointermove"
+					@onpointerup="pointerup"
+					@onpointerwheel="pointerwheel"
+				>
+				</u-pointer>
+
+				<view class="info" age="18">
+					<text class="title">矩形指针信息 {{ localPointers.length }}</text>
+					<view v-for="pointer in localPointers" :key="pointer.id">
+						<text>id: {{ pointer.id }}</text>
+						<text>x: {{ normalizeNumber(pointer.x) }}, y: {{ normalizeNumber(pointer.y) }}</text>
+						<text
+							>screenX: {{ normalizeNumber(pointer.screenX) }}, screenY: {{ normalizeNumber(pointer.screenY) }}</text
+						>
+						<text>pageX: {{ normalizeNumber(pointer.pageX) }}, pageY: {{ normalizeNumber(pointer.pageY) }}</text>
+					</view>
+				</view>
+
+				<view class="divider"></view>
+
+				<view class="info">
+					<text class="title">全局指针信息 {{ globalPointers.length }}</text>
+					<view v-for="pointer in globalPointers" :key="pointer.id">
+						<text>id: {{ pointer.id }}</text>
+						<text>x: {{ normalizeNumber(pointer.x) }}, y: {{ normalizeNumber(pointer.y) }}</text>
+						<text>screenX: {{ normalizeNumber(pointer.screenX) }}, screenY: {{ normalizeNumber(pointer.screenY) }}</text>
+						<text>pageX: {{ normalizeNumber(pointer.pageX) }}, pageY: {{ normalizeNumber(pointer.pageY) }}</text>
+					</view>
+				</view>
+			</view>
+		</u-pointer-root>
+	</view>
+</template>
+
+<style>
+.w-100 {
+	width: 100%;
+}
+
+.h-100 {
+	height: 100%;
+}
+
+.title {
+	font-weight: bold;
+}
+
+.rect {
+	left: 100px;
+	top: 0px;
+	width: 100px;
+	height: 100px;
+	background-color: red;
+}
+</style>

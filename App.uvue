@@ -1,0 +1,55 @@
+<script lang="ts">
+// #ifdef WEB
+document.documentElement.addEventListener("contextmenu", e => e.preventDefault(), false);
+// @ts-expect-error web api
+document.documentElement.addEventListener("touchmove", e => e.scale !== 1 && e.preventDefault(), { passive: false });
+// #endif
+
+let firstBackTime = 0;
+export default {
+	onLaunch: function () {
+		console.log("App Launch");
+	},
+	onShow: function () {
+		console.log("App Show");
+	},
+	onHide: function () {
+		console.log("App Hide");
+	},
+	// #ifdef APP-ANDROID
+	onLastPageBackPress: function () {
+		console.log("App LastPageBackPress");
+		if (firstBackTime == 0) {
+			uni.showToast({
+				title: "再按一次退出应用",
+				// position: "bottom",
+			});
+			firstBackTime = Date.now();
+			setTimeout(() => {
+				firstBackTime = 0;
+			}, 2000);
+		} else if (Date.now() - firstBackTime < 2000) {
+			firstBackTime = Date.now();
+			uni.exit();
+		}
+	},
+	// #endif
+	onExit: function () {
+		console.log("App Exit");
+	},
+};
+</script>
+
+<style>
+#app {
+	overflow: hidden;
+}
+/*每个页面公共css */
+.uni-row {
+	flex-direction: row;
+}
+
+.uni-column {
+	flex-direction: column;
+}
+</style>
