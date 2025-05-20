@@ -1,12 +1,12 @@
 import { Pointer } from "./pointer-events";
 
-export function getPointersByTouch(e: UniTouchEvent): Pointer[] {
-	const touches = Array.from(e.touches);
-	const pointers: Pointer[] = touches.map(t => {
-		if (!e.target) {
+export function getPointersByTouch(e : UniTouchEvent) : UTSJSONObject[] {
+	const touches = Array.from<UniTouch>(e.touches);
+	const pointers : Array<UTSJSONObject> = touches.map(t => {
+		if (e.target == null) {
 			// 目前还没有出现过target不存在的情况, 出现此情况再来看如何处理
 			throw new Error("no target");
-		}
+		}   
 
 		return {
 			id: t.identifier,
@@ -17,19 +17,19 @@ export function getPointersByTouch(e: UniTouchEvent): Pointer[] {
 			screenX: t.screenX,
 			screenY: t.screenY,
 			target: e.target,
-		};
+		} as UTSJSONObject;
 	});
 
 	return pointers;
 }
 
-export function getPointersByMouse(e: MouseEvent): Pointer[] {
-	if (!e.target) {
+export function getPointersByMouse(e : MouseEvent) : Pointer[] {
+	if (e.target == null) {
 		// 目前还没有出现过target不存在的情况, 出现此情况再来看如何处理
 		throw new Error("no target");
 	}
 
-	const pointers: Pointer[] = [
+	const pointers : Pointer[] = [
 		{
 			id: 0,
 			x: e.x,
@@ -45,13 +45,14 @@ export function getPointersByMouse(e: MouseEvent): Pointer[] {
 	return pointers;
 }
 
-export function getPointersByWheel(e: WheelEvent): Pointer[] {
-	if (!e.target) {
+// #ifndef APP-ANDROID
+export function getPointersByWheel(e : WheelEvent) : Pointer[] {
+	if (e.target == null) {
 		// 目前还没有出现过target不存在的情况, 出现此情况再来看如何处理
 		throw new Error("no target");
 	}
 
-	const pointers: Pointer[] = [
+	const pointers : Pointer[] = [
 		{
 			id: 0,
 			x: e.x,
@@ -66,3 +67,4 @@ export function getPointersByWheel(e: WheelEvent): Pointer[] {
 
 	return pointers;
 }
+// #endif

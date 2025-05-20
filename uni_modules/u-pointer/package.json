@@ -16,8 +16,8 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"import": "./index.ts",
-			"require": "./index.ts"
+			"import": "./index.uts",
+			"require": "./index.uts"
 		}
 	},
 	"engines": {

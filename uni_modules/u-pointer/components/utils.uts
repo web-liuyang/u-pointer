@@ -1,0 +1,11 @@
+export class MapUtils {
+	public static getValues<K, V>(map : Map<K, V>) : Array<V> {
+		// const values : Array<V> = [];
+		// map.forEach((v : V) => values.push(v)
+		map.forEach((v : V) => {
+			console.log(v);
+		})
+
+		return [];
+	}
+}

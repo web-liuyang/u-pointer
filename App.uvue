@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="uts">
 // #ifdef WEB
 document.documentElement.addEventListener("contextmenu", e => e.preventDefault(), false);
 // @ts-expect-error web api
@@ -41,9 +41,9 @@ export default {
 </script>
 
 <style>
-#app {
+/* #app {
 	overflow: hidden;
-}
+} */
 /*每个页面公共css */
 .uni-row {
 	flex-direction: row;

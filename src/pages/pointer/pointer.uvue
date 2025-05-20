@@ -1,72 +1,86 @@
-<script lang="ts" setup>
-import { computed, reactive } from "vue";
-import {
-	Pointer,
-	PointerclickEvent,
-	PointerwheelEvent,
-	PointerdownEvent,
-	PointermoveEvent,
-	PointerupEvent,
-	globalPointer,
-} from "@/uni_modules/u-pointer";
+<script lang="uts" setup>
+	import { computed, reactive } from "vue";
+	import {
+		Pointer,
+		PointerclickEvent,
+		PointerdownEvent,
+		PointermoveEvent,
+		PointerupEvent,
+		globalPointer,
+		// #ifndef APP-ANDROID
+		PointerwheelEvent,
+		// #endif
+		MapUtils
+	} from "@/uni_modules/u-pointer";
 
-const pointerMap = reactive({
-	local: new Map<number, Pointer>(),
-	global: new Map<number, Pointer>(),
-});
+	type PointerMap = {
+		local : Map<number, Pointer>;
+		global : Map<number, Pointer>;
+	}
 
-const localPointers = computed(() => [...pointerMap.local.values()]);
-const globalPointers = computed(() => [...pointerMap.global.values()]);
+	const pointerMap = reactive<PointerMap>({
+		local: new Map<number, Pointer>(),
+		global: new Map<number, Pointer>(),
+	});
 
-function pointerdown(e: PointerdownEvent) {
-	console.log("pointerdown");
-	pointerMap.local.set(e.pointer.id, e.pointer);
-}
+	const localPointers = computed(() =>  MapUtils.getValues<number, Pointer>(pointerMap.local));
+	const globalPointers = computed(() => MapUtils.getValues<number, Pointer>(pointerMap.global));
 
-function pointermove(e: PointermoveEvent) {
-	console.log("pointermove", e.pointer.id);
-	pointerMap.local.set(e.pointer.id, e.pointer);
-}
+	function pointerdown(e : PointerdownEvent) {
+		console.log("pointerdown");
+		pointerMap.global.clear();
+		pointerMap.local.set(e.pointer.id, e.pointer);
+	}
 
-function pointerup(e: PointerupEvent) {
-	console.log("pointerup", e.pointer.id);
-	pointerMap.local.delete(e.pointer.id);
-}
+	function pointermove(e : PointermoveEvent) {
+		console.log("pointermove", e.pointer.id);
+		pointerMap.local.set(e.pointer.id, e.pointer);
+	}
 
-function pointerclick(e: PointerclickEvent) {
-	console.log("pointerclick", e.pointer.id);
-}
+	function pointerup(e : PointerupEvent) {
+		console.log("pointerup", e.pointer.id);
+		pointerMap.local.delete(e.pointer.id);
+	}
 
-function pointerwheel(e: PointerwheelEvent) {
-	console.log("pointerwheel", e.pointer.id, e.direction);
-}
+	function pointerclick(e : PointerclickEvent) {
+		console.log("pointerclick", e.pointer.id);
+	}
 
-globalPointer.addEventListener("onpointerdown", e => {
-	console.log("root pointerdown", e.pointer.id);
-	pointerMap.global.set(e.pointer.id, e.pointer);
-});
+	// #ifndef APP-ANDROID
+	function pointerwheel(e : PointerwheelEvent) {
+		console.log("pointerwheel", e.pointer.id, e.direction);
+	}
+	// #endif
 
-globalPointer.addEventListener("onpointermove", e => {
-	console.log("root onpointermove", e.pointer.id);
-	pointerMap.global.set(e.pointer.id, e.pointer);
-});
 
-globalPointer.addEventListener("onpointerup", async e => {
-	console.log("root pointerup", e.pointer.id);
-	pointerMap.global.delete(e.pointer.id);
-});
+	globalPointer.addEventListener("onpointerdown", e => {
+		console.log("root pointerdown", e.pointer.id);
+		pointerMap.global.set(e.pointer.id, e.pointer);
+	});
 
-globalPointer.addEventListener("onpointerclick", e => {
-	console.log("root pointerclick", e.pointer.id);
-});
+	globalPointer.addEventListener("onpointermove", e => {
+		console.log("root onpointermove", e.pointer.id);
+		pointerMap.global.set(e.pointer.id, e.pointer);
+	});
 
-globalPointer.addEventListener("onpointerwheel", e => {
-	console.log("root pointerwheel", e.pointer.id, e.direction);
-});
+	globalPointer.addEventListener("onpointerup", e => {
+		console.log("root pointerup", e.pointer.id);
+		pointerMap.global.delete(e.pointer.id);
+	});
 
-function normalizeNumber(value: number): string {
-	return value.toFixed(2);
-}
+	globalPointer.addEventListener("onpointerclick", e => {
+		console.log("root pointerclick", e.pointer.id);
+	});
+
+	// #ifndef APP-ANDROID
+	globalPointer.addEventListener("onpointerwheel", e => {
+		console.log("root pointerwheel", e.pointer.id, e.direction);
+	});
+	// #endif
+
+	function normalizeNumber(value : number) : string {
+		return value.toFixed(2);
+	}
 </script>
 
 <template>
@@ -79,7 +93,9 @@ function normalizeNumber(value: number): string {
 					@onpointerdown="pointerdown"
 					@onpointermove="pointermove"
 					@onpointerup="pointerup"
+					<!-- #ifndef APP-ANDROID -->
 					@onpointerwheel="pointerwheel"
+					<!-- #endif -->
 				>
 				</u-pointer>
 
@@ -112,23 +128,23 @@ function normalizeNumber(value: number): string {
 </template>
 
 <style>
-.w-100 {
-	width: 100%;
-}
+	.w-100 {
+		width: 100%;
+	}
 
-.h-100 {
-	height: 100%;
-}
+	.h-100 {
+		height: 100%;
+	}
 
-.title {
-	font-weight: bold;
-}
+	.title {
+		font-weight: bold;
+	}
 
-.rect {
-	left: 100px;
-	top: 0px;
-	width: 100px;
-	height: 100px;
-	background-color: red;
-}
+	.rect {
+		left: 100px;
+		top: 0px;
+		width: 100px;
+		height: 100px;
+		background-color: red;
+	}
 </style>
