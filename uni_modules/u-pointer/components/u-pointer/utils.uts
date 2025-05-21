@@ -1,23 +1,34 @@
 import { Pointer } from "./pointer-events";
 
-export function getPointersByTouch(e : UniTouchEvent) : UTSJSONObject[] {
+export function getPointersByTouch(e : UniTouchEvent) : Pointer[] {
 	const touches = Array.from<UniTouch>(e.touches);
-	const pointers : Array<UTSJSONObject> = touches.map(t => {
+	const pointers : Array<Pointer> = touches.map(t => {
 		if (e.target == null) {
 			// 目前还没有出现过target不存在的情况, 出现此情况再来看如何处理
 			throw new Error("no target");
-		}   
+		}
 
-		return {
-			id: t.identifier,
-			x: t.clientX,
-			y: t.clientY,
-			pageX: t.pageX,
-			pageY: t.pageY,
-			screenX: t.screenX,
-			screenY: t.screenY,
-			target: e.target,
-		} as UTSJSONObject;
+		return new Pointer(
+			t.identifier,
+			t.clientX,
+			t.clientY,
+			t.pageX,
+			t.pageY,
+			t.screenX,
+			t.screenY,
+			e.target!,
+		)
+
+		// return {
+		// 	id: t.identifier,
+		// 	x: t.clientX,
+		// 	y: t.clientY,
+		// 	pageX: t.pageX,
+		// 	pageY: t.pageY,
+		// 	screenX: t.screenX,
+		// 	screenY: t.screenY,
+		// 	target: e.target,
+		// } as UTSJSONObject;
 	});
 
 	return pointers;
@@ -30,16 +41,25 @@ export function getPointersByMouse(e : MouseEvent) : Pointer[] {
 	}
 
 	const pointers : Pointer[] = [
-		{
-			id: 0,
-			x: e.x,
-			y: e.y,
-			pageX: e.pageX,
-			pageY: e.pageY,
-			screenX: e.screenX,
-			screenY: e.screenY,
-			target: e.target,
-		},
+		new Pointer(0,
+			e.x,
+			e.y,
+			e.pageX,
+			e.pageY,
+			e.screenX,
+			e.screenY,
+			e.target!,
+		)
+		// {
+		// 	id: 0,
+		// 	x: e.x,
+		// 	y: e.y,
+		// 	pageX: e.pageX,
+		// 	pageY: e.pageY,
+		// 	screenX: e.screenX,
+		// 	screenY: e.screenY,
+		// 	target: e.target,
+		// },
 	];
 
 	return pointers;
@@ -53,16 +73,15 @@ export function getPointersByWheel(e : WheelEvent) : Pointer[] {
 	}
 
 	const pointers : Pointer[] = [
-		{
-			id: 0,
-			x: e.x,
-			y: e.y,
-			pageX: e.pageX,
-			pageY: e.pageY,
-			screenX: e.screenX,
-			screenY: e.screenY,
-			target: e.target,
-		},
+		new Pointer(0,
+			e.x,
+			e.y,
+			e.pageX,
+			e.pageY,
+			e.screenX,
+			e.screenY,
+			e.target!,
+		)
 	];
 
 	return pointers;

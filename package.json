@@ -1,5 +1,5 @@
 {
-	"name": "u-pointer-repo",
+	"name": "u-pointer",
 	"version": "0.0.1",
 	"main": "main.uts",
 	"private": true,
@@ -10,9 +10,6 @@
 	},
 	"author": "web-liuyang",
 	"description": "",
-	"dependencies": {
-		"u-pointer": "workspace:*"
-	},
 	"devDependencies": {
 		"@dcloudio/uni-app-x": "^0.7.30",
 		"@types/node": "^22.5.5",

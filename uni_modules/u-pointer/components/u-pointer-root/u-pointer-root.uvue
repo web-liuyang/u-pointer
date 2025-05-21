@@ -8,9 +8,9 @@
 		// #ifndef APP-ANDROID
 		PointerwheelEvent,
 		// #endif
-	} from "../u-pointer/pointer-events";
+	} from "../u-pointer/pointer-events.uts";
 	import uPointer from "../u-pointer/u-pointer.uvue";
-	import { globalPointer } from "../u-pointer/global-pointer";
+	import { globalPointer } from "../u-pointer/global-pointer.uts";
 
 	// defineOptions({
 	// 	name: "u-pointer-root",
@@ -51,10 +51,12 @@
 		<slot />
 	</u-pointer>
 	<!-- #endif -->
+
 	<!-- #ifdef APP-ANDROID -->
 	<u-pointer style="height: 100%; width: 100%" @onpointerdown="pointerdown" @onpointermove="pointermove"
 		@onpointerup="pointerup" @onpointercancel="pointercancel" @onpointerclick="pointerclick">
 		<slot />
 	</u-pointer>
 	<!-- #endif -->
+
 </template>

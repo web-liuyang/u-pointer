@@ -7,12 +7,7 @@ new VConsole();
 // #endif
 
 export function createApp() {
-	// const info = uni.getSystemInfoSync();
-	// if (info.platform === "ios") {
-	// 	new VConsole();
-	// }
 	const app = createSSRApp(App);
-
 	return {
 		app,
 	};

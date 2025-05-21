@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      u-pointer:
-        specifier: workspace:*
-        version: link:uni_modules/u-pointer
     devDependencies:
       '@dcloudio/uni-app-x':
         specifier: ^0.7.30

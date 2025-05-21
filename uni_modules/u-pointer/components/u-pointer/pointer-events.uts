@@ -1,65 +1,106 @@
 export type PointerId = number;
 
-export type Pointer {
-	/** 触摸点的标识符。这个值在这根手指所引发的所有事件中保持一致，直到手指抬起。 */
-	id : PointerId;
-	/** 相对于页面可显示区域左边的距离 */
-	x : number;
-	/** 相对于页面可显示区域顶部的距离 */
-	y : number;
-	/** 相对于屏幕左边的距离，包括滚动距离 */
-	pageX : number;
-	/** 相对于屏幕顶部的距离，包括滚动距离 */
-	pageY : number;
-	/** 相对于屏幕左边的距离，不包括滚动距离 */
-	screenX : number;
-	/** 相对于屏幕顶部的距离，不包括滚动距离 */
-	screenY : number;
-	/** 触发指针目标 */
-	// #ifndef APP-ANDROID
-	target : UniElement | EventTarget;
-	// #endif
-	// #ifdef APP-ANDROID
-	target : UniElement;
-	// #endif
+export class Pointer {
+	// /** 触摸点的标识符。这个值在这根手指所引发的所有事件中保持一致，直到手指抬起。 */
+	// public readonly id : PointerId;
+	// /** 相对于页面可显示区域左边的距离 */
+	// public readonly x : number;
+	// /** 相对于页面可显示区域顶部的距离 */
+	// public readonly y : number;
+	// /** 相对于屏幕左边的距离，包括滚动距离 */
+	// public readonly pageX : number;
+	// /** 相对于屏幕顶部的距离，包括滚动距离 */
+	// public readonly pageY : number;
+	// /** 相对于屏幕左边的距离，不包括滚动距离 */
+	// public readonly screenX : number;
+	// /** 相对于屏幕顶部的距离，不包括滚动距离 */
+	// public readonly screenY : number;
+	// /** 触发指针目标 */
+	// // #ifndef APP-ANDROID
+	// public readonly target : UniElement | EventTarget;
+	// // #endif
+	// // #ifdef APP-ANDROID
+	// public readonly target : UniElement;
+	// // #endif
+
+	constructor(
+		/** 触摸点的标识符。这个值在这根手指所引发的所有事件中保持一致，直到手指抬起。 */
+		public readonly id : PointerId,
+		/** 相对于页面可显示区域左边的距离 */
+		public readonly x : number,
+		/** 相对于页面可显示区域顶部的距离 */
+		public readonly y : number,
+		/** 相对于屏幕左边的距离，包括滚动距离 */
+		public readonly pageX : number,
+		/** 相对于屏幕顶部的距离，包括滚动距离 */
+		public readonly pageY : number,
+		/** 相对于屏幕左边的距离，不包括滚动距离 */
+		public readonly screenX : number,
+		/** 相对于屏幕顶部的距离，不包括滚动距离 */
+		public readonly screenY : number,
+		/** 触发指针目标 */
+		// #ifndef APP-ANDROID
+		public readonly target : UniElement | EventTarget,
+		// #endif
+		// #ifdef APP-ANDROID
+		public readonly target : UniElement,
+		// #endif
+	) { }
 }
 
 /** 偏移量 */
-export type Delta {
-	/** x 方向偏移量 */
-	x : number;
-	/** y 方向偏移量 */
-	y : number;
+export class Delta {
+	// /** x 方向偏移量 */
+	// public readonly x : number;
+	// /** y 方向偏移量 */
+	// public readonly y : number;
+
+	constructor(
+		/** x 方向偏移量 */
+		public readonly x : number,
+		/** y 方向偏移量 */
+		public readonly y : number,
+	) { }
 }
 
-export type MovePointer = {
-	/** 触摸点的标识符。这个值在这根手指所引发的所有事件中保持一致，直到手指抬起。 */
-	id : PointerId;
-	/** 相对于页面可显示区域左边的距离 */
-	x : number;
-	/** 相对于页面可显示区域顶部的距离 */
-	y : number;
-	/** 相对于屏幕左边的距离，包括滚动距离 */
-	pageX : number;
-	/** 相对于屏幕顶部的距离，包括滚动距离 */
-	pageY : number;
-	/** 相对于屏幕左边的距离，不包括滚动距离 */
-	screenX : number;
-	/** 相对于屏幕顶部的距离，不包括滚动距离 */
-	screenY : number;
-	/** 触发指针目标 */
-	// #ifndef APP-ANDROID
-	target : UniElement | EventTarget;
-	// #endif
-	// #ifdef APP-ANDROID
-	target : UniElement;
-	// #endif
-	delta: Delta;
+export class MovePointer extends Pointer {
+
+	static createByPointer(pointer : Pointer, delta : Delta) {
+		return new MovePointer(pointer.id, pointer.x, pointer.y, pointer.pageX, pointer.pageY, pointer.screenX, pointer.screenY, pointer.target, delta);
+	}
+
+	constructor(
+		/** 触摸点的标识符。这个值在这根手指所引发的所有事件中保持一致，直到手指抬起。 */
+		id : PointerId,
+		/** 相对于页面可显示区域左边的距离 */
+		x : number,
+		/** 相对于页面可显示区域顶部的距离 */
+		y : number,
+		/** 相对于屏幕左边的距离，包括滚动距离 */
+		pageX : number,
+		/** 相对于屏幕顶部的距离，包括滚动距离 */
+		pageY : number,
+		/** 相对于屏幕左边的距离，不包括滚动距离 */
+		screenX : number,
+		/** 相对于屏幕顶部的距离，不包括滚动距离 */
+		screenY : number,
+		/** 触发指针目标 */
+		// #ifndef APP-ANDROID
+		target : UniElement | EventTarget,
+		// #endif
+		// #ifdef APP-ANDROID
+		target : UniElement,
+		// #endif
+		public readonly delta : Delta,
+	) {
+		super(id, x, y, pageX, pageY, screenX, screenY, target);
+	}
 }
 
 // #ifndef APP-ANDROID
 export type NativeEvent = UniTouchEvent | MouseEvent | WheelEvent;
 // #endif
+
 // #ifdef APP-ANDROID
 export type NativeEvent = UniTouchEvent;
 // #endif
@@ -149,3 +190,5 @@ export interface EventTypeMap {
 	onpointerwheel : PointerwheelEvent;
 	// #endif
 }
+
+export type EventType = "onpointerclick" | "onpointerdown" | "onpointermove" | "onpointerup" | "onpointercancel" | "onpointerwheel";

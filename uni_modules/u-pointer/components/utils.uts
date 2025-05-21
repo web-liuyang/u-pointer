@@ -1,11 +1,9 @@
 export class MapUtils {
 	public static getValues<K, V>(map : Map<K, V>) : Array<V> {
-		// const values : Array<V> = [];
-		// map.forEach((v : V) => values.push(v)
-		map.forEach((v : V) => {
-			console.log(v);
-		})
-
-		return [];
+		const values : Array<V> = [];
+		map.forEach((value : V, key : K, map : Map<K, V>): void => {
+			values.push(value);
+		});
+		return values;
 	}
 }

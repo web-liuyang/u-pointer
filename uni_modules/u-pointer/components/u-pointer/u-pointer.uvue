@@ -1,6 +1,7 @@
 <script lang="uts" setup>
-	// import { ref } from "vue"; 
-	import { Pointer, PointerId, EventTypeMap } from "./pointer-events";
+	// import UniViewElement from 'io.dcloud.uniapp.runtime.UniViewElement';
+	import { ref } from "vue";
+	import { Pointer, PointerId, EventTypeMap } from "./pointer-events.uts";
 	import {
 		PointerclickEvent,
 		PointerdownEvent,
@@ -8,8 +9,12 @@
 		PointermoveEvent,
 		PointercancelEvent,
 		PointerwheelEvent,
-	} from "./pointer-events";
-	import { getPointersByMouse, getPointersByTouch, getPointersByWheel } from "./utils";
+		NativeEvent,
+		MovePointer,
+		Delta,
+	} from "./pointer-events.uts";
+	import { getPointersByMouse, getPointersByTouch, getPointersByWheel } from "./utils.uts";
+	import { MapUtils } from "../utils.uts";
 
 	const isPC = uni.getSystemInfoSync().deviceType === "pc";
 
@@ -41,18 +46,21 @@
 	///////////////        事件触发        ///////////////
 	///////////////                       ///////////////
 	/////////////////////////////////////////////////////
- 
-	async function onpointerdown(pointers : Pointer[], e : UniTouchEvent | MouseEvent) : Promise<void> {
+
+	async function onpointerdown(pointers : Pointer[], e : NativeEvent) : Promise<void> {
+		if (uPointer.value == null) return;
+
 		for (const pointer of pointers) {
-			const curRect = await uPointer.value?.getBoundingClientRectAsync();
-			if (curRect == null) continue;
+			// 这个有问题, 在 Android 上没有被Promise包装,虽然说打印出来的类型是Promise, 但是可以直接使用
+			// console.log(await uPointer.value?.getBoundingClientRectAsync()); 
+			const curRect = await ((uPointer.value!.getBoundingClientRectAsync()) as Promise<DOMRect>);
 			// 没有在范围内
 			if (
 				!(
-					pointer.x >= curRect.left &&
-					pointer.x <= curRect.left + curRect.width &&
-					pointer.y >= curRect.top &&
-					pointer.y <= curRect.top + curRect.height
+					pointer.x >= curRect!.left &&
+					pointer.x <= curRect!.left + curRect!.width &&
+					pointer.y >= curRect!.top &&
+					pointer.y <= curRect!.top + curRect!.height
 				)
 			)
 				continue;
@@ -74,18 +82,19 @@
 		}
 	}
 
-	function onpointermove(pointers : Pointer[], e : UniTouchEvent | MouseEvent) {
+	function onpointermove(pointers : Pointer[], e : NativeEvent) {
 		const _tempPressedPointers = new Map(pressedPointers);
 		pressedPointers.clear();
 
 		for (const pointer of pointers) {
-			const pressedPointer = _tempPressedPointers.get(pointer.id);
-			if (pressedPointer) {
-				pointer;
+			if (_tempPressedPointers.has(pointer.id)) {
+				const pressedPointer = _tempPressedPointers.get(pointer.id)!;
 				const deltaX = pointer.x - pressedPointer.x;
 				const deltaY = pointer.y - pressedPointer.y;
+				const delta = new Delta(deltaX, deltaY);
+				const movePointer = MovePointer.createByPointer(pointer, delta);
+				const pointermove = new PointermoveEvent(movePointer, e);
 
-				const pointermove = new PointermoveEvent({ ...pointer, delta: { x: deltaX, y: deltaY } }, e);
 				emit("onpointermove", pointermove);
 				pressedPointers.set(pointer.id, pointer);
 				preonclickPointers.delete(pointer.id);
@@ -93,8 +102,8 @@
 		}
 	}
 
-	function onpointerup(pointers : Pointer[], e : UniTouchEvent | MouseEvent) {
-		const _tempPressedPointers = [...pressedPointers.values()];
+	function onpointerup(pointers : Pointer[], e : NativeEvent) {
+		const _tempPressedPointers = MapUtils.getValues<PointerId, Pointer>(pressedPointers);
 		pressedPointers.clear();
 
 		for (const pointer of _tempPressedPointers) {
@@ -118,8 +127,8 @@
 		}
 	}
 
-	function onpointercancel(pointers : Pointer[], e : UniTouchEvent | MouseEvent) {
-		const _tempPressedPointers = [...pressedPointers.values()];
+	function onpointercancel(pointers : Pointer[], e : NativeEvent) {
+		const _tempPressedPointers = MapUtils.getValues<PointerId, Pointer>(pressedPointers);
 		pressedPointers.clear();
 
 		for (const pointer of _tempPressedPointers) {
@@ -139,12 +148,17 @@
 		}
 	}
 
+	// #ifndef APP-ANDROID
+
 	function onpointerwheel(pointers : Pointer[], e : WheelEvent) {
 		for (const pointer of pointers) {
 			const pointerwheel = new PointerwheelEvent(pointer, e);
 			emit("onpointerwheel", pointerwheel);
 		}
 	}
+
+	// #endif
+
 
 	/////////////////////////////////////////////////////
 	///////////////                       ///////////////
@@ -171,6 +185,8 @@
 		const pointers : Pointer[] = getPointersByTouch(e);
 		onpointercancel(pointers, e);
 	};
+
+	// #ifndef APP-ANDROID
 
 	/////////////////////////////////////////////////////
 	///////////////                       ///////////////
@@ -212,11 +228,22 @@
 		const pointers : Pointer[] = getPointersByWheel(e);
 		onpointerwheel(pointers, e);
 	};
+
+	// #endif
 </script>
 
 <template>
+	<!-- #ifndef APP-ANDROID -->
 	<view ref="uPointer" @touchstart="onTouchstart" @touchmove="onTouchmove" @touchcancel="onTouchcancel"
 		@touchend="onTouchend" @mousedown="onMousedown" @wheel="onWheel">
 		<slot />
 	</view>
+	<!-- #endif -->
+
+	<!-- #ifdef APP-ANDROID -->
+	<view ref="uPointer" @touchstart="onTouchstart" @touchmove="onTouchmove" @touchcancel="onTouchcancel"
+		@touchend="onTouchend">
+		<slot />
+	</view>
+	<!-- #endif -->
 </template>

@@ -1,7 +1,7 @@
 {
-    "name" : "u-canvas-example",
-    "appid" : "__UNI__u-canvas-example",
-    "description" : "u-canvas-example",
+    "name" : "u-pointer-repo",
+    "appid" : "",
+    "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "uni-app-x" : {},
@@ -9,10 +9,9 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wxff62a630678ff796",
+        "appid" : "",
         "setting" : {
-            "urlCheck" : false,
-            "es6" : true
+            "urlCheck" : false
         },
         "usingComponents" : true
     },

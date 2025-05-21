@@ -1,6 +1,7 @@
 <script lang="uts" setup>
 	import { computed, reactive } from "vue";
 	import {
+		PointerId,
 		Pointer,
 		PointerclickEvent,
 		PointerdownEvent,
@@ -14,21 +15,21 @@
 	} from "@/uni_modules/u-pointer";
 
 	type PointerMap = {
-		local : Map<number, Pointer>;
-		global : Map<number, Pointer>;
+		local : Map<PointerId, Pointer>;
+		global : Map<PointerId, Pointer>;
 	}
 
 	const pointerMap = reactive<PointerMap>({
-		local: new Map<number, Pointer>(),
-		global: new Map<number, Pointer>(),
+		local: new Map<PointerId, Pointer>(),
+		global: new Map<PointerId, Pointer>(),
 	});
 
-	const localPointers = computed(() =>  MapUtils.getValues<number, Pointer>(pointerMap.local));
-	const globalPointers = computed(() => MapUtils.getValues<number, Pointer>(pointerMap.global));
+
+	const localPointers = computed(() =>  MapUtils.getValues<PointerId, Pointer>(pointerMap.local));
+	const globalPointers = computed(() => MapUtils.getValues<PointerId, Pointer>(pointerMap.global));
 
 	function pointerdown(e : PointerdownEvent) {
 		console.log("pointerdown");
-		pointerMap.global.clear();
 		pointerMap.local.set(e.pointer.id, e.pointer);
 	}
 
@@ -73,7 +74,7 @@
 	});
 
 	// #ifndef APP-ANDROID
-	globalPointer.addEventListener("onpointerwheel", e => {
+	globalPointer.addEventListener("onpointerwheel", (e) => {
 		console.log("root pointerwheel", e.pointer.id, e.direction);
 	});
 	// #endif
