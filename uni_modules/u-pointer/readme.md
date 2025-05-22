@@ -30,7 +30,7 @@
 
 #### 使用方法
 
-```vue
+```uvue
 <template>
 	<u-pointer
 		@onpointerclick="pointerclick"
@@ -54,8 +54,8 @@
 
 #### 使用方法
 
-```vue
-<script lang="ts" setup>
+```uvue
+<script lang="uts" setup>
 import { onMounted, onUnmounted } from "vue";
 import { PointerdownEvent, globalPointer } from "@/uni_modules/u-pointer";
 function pointerdown(event: PointerdownEvent): void {
@@ -63,11 +63,11 @@ function pointerdown(event: PointerdownEvent): void {
 }
 
 onMounted(() => {
-	globalPointer.addEventListener("onpointerdown", pointerdown);
+	globalPointer.addEventListener<PointerdownEvent>("onpointerdown", pointerdown);
 });
 
 onUnmounted(() => {
-	globalPointer.removeEventListener("onpointerdown", pointerdown);
+	globalPointer.removeEventListener<PointerdownEvent>("onpointerdown", pointerdown);
 });
 </script>
 
