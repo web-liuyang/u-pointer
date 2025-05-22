@@ -1,0 +1,9 @@
+// #ifdef WEB
+
+export type PointerTarget = UniElement | EventTarget;
+
+export type NativeEvent = UniTouchEvent | MouseEvent | WheelEvent;
+
+export type EventType = "onpointerclick" | "onpointerdown" | "onpointermove" | "onpointerup" | "onpointercancel" | "onpointerwheel";
+
+// #endif

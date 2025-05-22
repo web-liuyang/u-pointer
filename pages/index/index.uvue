@@ -1,5 +1,8 @@
 <script lang="uts" setup>
 	import { computed, reactive } from "vue";
+	// #ifdef WEB
+	import { PointerwheelEvent } from "@/uni_modules/u-pointer/index.uts";
+	// #endif
 	import {
 		PointerId,
 		Pointer,
@@ -8,11 +11,8 @@
 		PointermoveEvent,
 		PointerupEvent,
 		globalPointer,
-		// #ifndef APP-ANDROID
-		PointerwheelEvent,
-		// #endif
-		MapUtils
-	} from "@/uni_modules/u-pointer";
+		MapUtils,
+	} from "@/uni_modules/u-pointer/index.uts";
 
 	type PointerMap = {
 		local : Map<PointerId, Pointer>;
@@ -25,7 +25,7 @@
 	});
 
 
-	const localPointers = computed(() =>  MapUtils.getValues<PointerId, Pointer>(pointerMap.local));
+	const localPointers = computed(() => MapUtils.getValues<PointerId, Pointer>(pointerMap.local));
 	const globalPointers = computed(() => MapUtils.getValues<PointerId, Pointer>(pointerMap.global));
 
 	function pointerdown(e : PointerdownEvent) {
@@ -47,34 +47,34 @@
 		console.log("pointerclick", e.pointer.id);
 	}
 
-	// #ifndef APP-ANDROID
+	// #ifdef WEB
 	function pointerwheel(e : PointerwheelEvent) {
 		console.log("pointerwheel", e.pointer.id, e.direction);
 	}
 	// #endif
 
 
-	globalPointer.addEventListener("onpointerdown", e => {
+	globalPointer.addEventListener<PointerdownEvent>("onpointerdown", e => {
 		console.log("root pointerdown", e.pointer.id);
 		pointerMap.global.set(e.pointer.id, e.pointer);
 	});
 
-	globalPointer.addEventListener("onpointermove", e => {
+	globalPointer.addEventListener<PointermoveEvent>("onpointermove", e => {
 		console.log("root onpointermove", e.pointer.id);
 		pointerMap.global.set(e.pointer.id, e.pointer);
 	});
 
-	globalPointer.addEventListener("onpointerup", e => {
+	globalPointer.addEventListener<PointerupEvent>("onpointerup", e => {
 		console.log("root pointerup", e.pointer.id);
 		pointerMap.global.delete(e.pointer.id);
 	});
 
-	globalPointer.addEventListener("onpointerclick", e => {
+	globalPointer.addEventListener<PointerclickEvent>("onpointerclick", e => {
 		console.log("root pointerclick", e.pointer.id);
 	});
 
-	// #ifndef APP-ANDROID
-	globalPointer.addEventListener("onpointerwheel", (e) => {
+	// #ifdef WEB
+	globalPointer.addEventListener<PointerwheelEvent>("onpointerwheel", (e) => {
 		console.log("root pointerwheel", e.pointer.id, e.direction);
 	});
 	// #endif
@@ -88,26 +88,23 @@
 	<view class="w-100 h-100">
 		<u-pointer-root>
 			<view>
-				<u-pointer
-					class="rect"
-					@onpointerclick="pointerclick"
-					@onpointerdown="pointerdown"
-					@onpointermove="pointermove"
-					@onpointerup="pointerup"
-					<!-- #ifndef APP-ANDROID -->
-					@onpointerwheel="pointerwheel"
-					<!-- #endif -->
-				>
-				</u-pointer>
+				<!-- #ifdef WEB -->
+				<u-pointer class="rect" @onpointerclick="pointerclick" @onpointerdown="pointerdown" @onpointermove="pointermove"
+					@onpointerup="pointerup" @onpointerwheel="pointerwheel" />
+				<!-- #endif -->
+
+				<!-- #ifndef WEB -->
+				<u-pointer class="rect" @onpointerclick="pointerclick" @onpointerdown="pointerdown" @onpointermove="pointermove"
+					@onpointerup="pointerup" />
+				<!-- #endif -->
 
 				<view class="info" age="18">
 					<text class="title">矩形指针信息 {{ localPointers.length }}</text>
 					<view v-for="pointer in localPointers" :key="pointer.id">
 						<text>id: {{ pointer.id }}</text>
 						<text>x: {{ normalizeNumber(pointer.x) }}, y: {{ normalizeNumber(pointer.y) }}</text>
-						<text
-							>screenX: {{ normalizeNumber(pointer.screenX) }}, screenY: {{ normalizeNumber(pointer.screenY) }}</text
-						>
+						<text>screenX: {{ normalizeNumber(pointer.screenX) }}, screenY:
+							{{ normalizeNumber(pointer.screenY) }}</text>
 						<text>pageX: {{ normalizeNumber(pointer.pageX) }}, pageY: {{ normalizeNumber(pointer.pageY) }}</text>
 					</view>
 				</view>
@@ -119,7 +116,8 @@
 					<view v-for="pointer in globalPointers" :key="pointer.id">
 						<text>id: {{ pointer.id }}</text>
 						<text>x: {{ normalizeNumber(pointer.x) }}, y: {{ normalizeNumber(pointer.y) }}</text>
-						<text>screenX: {{ normalizeNumber(pointer.screenX) }}, screenY: {{ normalizeNumber(pointer.screenY) }}</text>
+						<text>screenX: {{ normalizeNumber(pointer.screenX) }}, screenY:
+							{{ normalizeNumber(pointer.screenY) }}</text>
 						<text>pageX: {{ normalizeNumber(pointer.pageX) }}, pageY: {{ normalizeNumber(pointer.pageY) }}</text>
 					</view>
 				</view>

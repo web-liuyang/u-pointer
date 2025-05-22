@@ -1,14 +1,19 @@
 <script lang="uts" setup>
-	// import UniViewElement from 'io.dcloud.uniapp.runtime.UniViewElement';
 	import { ref } from "vue";
-	import { Pointer, PointerId, EventTypeMap } from "./pointer-events.uts";
+	// #ifdef WEB
+	import { PointerwheelEvent } from "./pointer-events.uts";
+	// #endif
+
 	import {
+		Pointer,
+		PointerId,
+		EventType,
+		BasePointerEvent,
 		PointerclickEvent,
 		PointerdownEvent,
 		PointerupEvent,
 		PointermoveEvent,
 		PointercancelEvent,
-		PointerwheelEvent,
 		NativeEvent,
 		MovePointer,
 		Delta,
@@ -18,12 +23,8 @@
 
 	const isPC = uni.getSystemInfoSync().deviceType === "pc";
 
-	// defineOptions({
-	// 	name: "u-pointer",
-	// });
-
 	const emit = defineEmits<{
-		<T extends keyof EventTypeMap>(name : T, event : EventTypeMap[T]) : void;
+		<T extends BasePointerEvent>(name : EventType, event : T) : void;
 	}>();
 
 	// 其实在 UniEvent 中是有 currentTarget 来表示当前组件的,
@@ -38,8 +39,6 @@
 	let pressedPointers : Map<PointerId, Pointer> = new Map();
 	/** 超时后会被移除掉 */
 	let preonclickPointers : Map<PointerId, number> = new Map();
-
-
 
 	/////////////////////////////////////////////////////
 	///////////////                       ///////////////
@@ -109,7 +108,7 @@
 		for (const pointer of _tempPressedPointers) {
 			// 这里与Touch是反的
 			// Mouse 会返回已经抬起的指针
-			// Touch不会返回已经抬起的指针
+			// Touch 不会返回已经抬起的指针
 			// 所以需要取反
 			const isPressed = isPC ? pointers.some(t => t.id !== pointer.id) : pointers.some(t => t.id === pointer.id);
 			if (!isPressed) {
@@ -148,7 +147,7 @@
 		}
 	}
 
-	// #ifndef APP-ANDROID
+	// #ifdef WEB
 
 	function onpointerwheel(pointers : Pointer[], e : WheelEvent) {
 		for (const pointer of pointers) {
@@ -186,7 +185,7 @@
 		onpointercancel(pointers, e);
 	};
 
-	// #ifndef APP-ANDROID
+	// #ifdef WEB
 
 	/////////////////////////////////////////////////////
 	///////////////                       ///////////////
@@ -233,14 +232,14 @@
 </script>
 
 <template>
-	<!-- #ifndef APP-ANDROID -->
+	<!-- #ifdef WEB -->
 	<view ref="uPointer" @touchstart="onTouchstart" @touchmove="onTouchmove" @touchcancel="onTouchcancel"
 		@touchend="onTouchend" @mousedown="onMousedown" @wheel="onWheel">
 		<slot />
 	</view>
 	<!-- #endif -->
 
-	<!-- #ifdef APP-ANDROID -->
+	<!-- #ifndef WEB -->
 	<view ref="uPointer" @touchstart="onTouchstart" @touchmove="onTouchmove" @touchcancel="onTouchcancel"
 		@touchend="onTouchend">
 		<slot />
