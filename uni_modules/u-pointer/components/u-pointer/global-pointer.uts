@@ -1,17 +1,20 @@
-import { EventTypeMap, EventType, BasePointerEvent } from "./pointer-events.uts";
+import { EventType, BasePointerEvent, } from "./pointer-events.uts";
+
+export type Listener<T> = (e : T) => void;
 
 /** 事件监听器 */
 export class GlobalPointer {
-	private _listeners = new Map<keyof EventTypeMap, Array<((e: BasePointerEvent) => void)>>();
+	private _listeners = new Map<EventType, Array<Listener<BasePointerEvent>>>();
 
 	/**
 	 * 添加事件监听器
 	 * @param type 事件类型
 	 * @param listener 回调函数
 	 */
-	public addEventListener(type: EventType, listener: (e: BasePointerEvent) => void) {
+	public addEventListener<T extends BasePointerEvent>(type : EventType, listener : Listener<T>) {
 		if (!this._listeners.has(type)) this._listeners.set(type, []);
-		this._listeners.get(type)!.push(listener);
+		const listeners = this._listeners.get(type)! as Array<Listener<T>>;
+		listeners.push(listener);
 	}
 
 	/**
@@ -19,7 +22,7 @@ export class GlobalPointer {
 	 * @param type 事件类型
 	 * @param listener 回调函数
 	 */
-	public removeEventListener(type: EventType, listener: (e: BasePointerEvent) => void) {
+	public removeEventListener<T extends BasePointerEvent>(type : EventType, listener : Listener<T>) {
 		if (!this._listeners.has(type)) return;
 		const index = this._listeners.get(type)?.findIndex(cb => cb === listener) ?? -1;
 		if (index < 0) return;
@@ -31,9 +34,9 @@ export class GlobalPointer {
 	 * @param type 事件类型
 	 * @param event 事件对象
 	 */
-	public notify(type: EventType, event: BasePointerEvent) {
+	public notify<T extends BasePointerEvent>(type : EventType, event : T) {
 		if (!this._listeners.has(type)) return;
-		
+
 		this._listeners.get(type)?.forEach((listener) => {
 			listener(event);
 		})

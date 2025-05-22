@@ -1,13 +1,14 @@
 <script lang="uts" setup>
-	import type {
+	// #ifdef WEB
+	import { PointerwheelEvent } from "../u-pointer/pointer-events.uts";
+	// #endif
+
+	import {
 		PointerclickEvent,
 		PointerdownEvent,
 		PointerupEvent,
 		PointermoveEvent,
 		PointercancelEvent,
-		// #ifndef APP-ANDROID
-		PointerwheelEvent,
-		// #endif
 	} from "../u-pointer/pointer-events.uts";
 	import uPointer from "../u-pointer/u-pointer.uvue";
 	import { globalPointer } from "../u-pointer/global-pointer.uts";
@@ -44,7 +45,7 @@
 </script>
 
 <template>
-	<!-- #ifndef APP-ANDROID -->
+	<!-- #ifdef WEB -->
 	<u-pointer style="height: 100%; width: 100%" @onpointerdown="pointerdown" @onpointermove="pointermove"
 		@onpointerup="pointerup" @onpointercancel="pointercancel" @onpointerclick="pointerclick"
 		@onpointerwheel="pointerwheel">
@@ -52,7 +53,7 @@
 	</u-pointer>
 	<!-- #endif -->
 
-	<!-- #ifdef APP-ANDROID -->
+	<!-- #ifndef WEB -->
 	<u-pointer style="height: 100%; width: 100%" @onpointerdown="pointerdown" @onpointermove="pointermove"
 		@onpointerup="pointerup" @onpointercancel="pointercancel" @onpointerclick="pointerclick">
 		<slot />

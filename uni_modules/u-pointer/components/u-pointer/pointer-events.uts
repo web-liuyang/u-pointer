@@ -1,28 +1,6 @@
 export type PointerId = number;
 
 export class Pointer {
-	// /** 触摸点的标识符。这个值在这根手指所引发的所有事件中保持一致，直到手指抬起。 */
-	// public readonly id : PointerId;
-	// /** 相对于页面可显示区域左边的距离 */
-	// public readonly x : number;
-	// /** 相对于页面可显示区域顶部的距离 */
-	// public readonly y : number;
-	// /** 相对于屏幕左边的距离，包括滚动距离 */
-	// public readonly pageX : number;
-	// /** 相对于屏幕顶部的距离，包括滚动距离 */
-	// public readonly pageY : number;
-	// /** 相对于屏幕左边的距离，不包括滚动距离 */
-	// public readonly screenX : number;
-	// /** 相对于屏幕顶部的距离，不包括滚动距离 */
-	// public readonly screenY : number;
-	// /** 触发指针目标 */
-	// // #ifndef APP-ANDROID
-	// public readonly target : UniElement | EventTarget;
-	// // #endif
-	// // #ifdef APP-ANDROID
-	// public readonly target : UniElement;
-	// // #endif
-
 	constructor(
 		/** 触摸点的标识符。这个值在这根手指所引发的所有事件中保持一致，直到手指抬起。 */
 		public readonly id : PointerId,
@@ -39,22 +17,12 @@ export class Pointer {
 		/** 相对于屏幕顶部的距离，不包括滚动距离 */
 		public readonly screenY : number,
 		/** 触发指针目标 */
-		// #ifndef APP-ANDROID
-		public readonly target : UniElement | EventTarget,
-		// #endif
-		// #ifdef APP-ANDROID
-		public readonly target : UniElement,
-		// #endif
+		public readonly target : PointerTarget
 	) { }
 }
 
 /** 偏移量 */
 export class Delta {
-	// /** x 方向偏移量 */
-	// public readonly x : number;
-	// /** y 方向偏移量 */
-	// public readonly y : number;
-
 	constructor(
 		/** x 方向偏移量 */
 		public readonly x : number,
@@ -66,7 +34,17 @@ export class Delta {
 export class MovePointer extends Pointer {
 
 	static createByPointer(pointer : Pointer, delta : Delta) {
-		return new MovePointer(pointer.id, pointer.x, pointer.y, pointer.pageX, pointer.pageY, pointer.screenX, pointer.screenY, pointer.target, delta);
+		return new MovePointer(
+			pointer.id,
+			pointer.x,
+			pointer.y,
+			pointer.pageX,
+			pointer.pageY,
+			pointer.screenX,
+			pointer.screenY,
+			pointer.target,
+			delta,
+		);
 	}
 
 	constructor(
@@ -85,25 +63,12 @@ export class MovePointer extends Pointer {
 		/** 相对于屏幕顶部的距离，不包括滚动距离 */
 		screenY : number,
 		/** 触发指针目标 */
-		// #ifndef APP-ANDROID
-		target : UniElement | EventTarget,
-		// #endif
-		// #ifdef APP-ANDROID
-		target : UniElement,
-		// #endif
+		target : PointerTarget,
 		public readonly delta : Delta,
 	) {
 		super(id, x, y, pageX, pageY, screenX, screenY, target);
 	}
 }
-
-// #ifndef APP-ANDROID
-export type NativeEvent = UniTouchEvent | MouseEvent | WheelEvent;
-// #endif
-
-// #ifdef APP-ANDROID
-export type NativeEvent = UniTouchEvent;
-// #endif
 
 /** 基础指针事件 */
 export class BasePointerEvent {
@@ -159,10 +124,20 @@ export class PointercancelEvent extends BasePointerEvent {
 	}
 }
 
-// #ifndef APP-ANDROID
+// #ifdef WEB
+
+import { PointerTarget, NativeEvent, EventType } from "./pointer-events-web.uts";
+
+export enum WheelDirection {
+	up,
+	down,
+	left,
+	right,
+}
+
 /** 滚动事件 */
 export class PointerwheelEvent extends BasePointerEvent {
-	public readonly direction : "up" | "down" | "left" | "right";
+	public readonly direction : WheelDirection;
 
 	constructor(pointer : Pointer, nativeEvent : WheelEvent) {
 		super(pointer, nativeEvent);
@@ -171,24 +146,19 @@ export class PointerwheelEvent extends BasePointerEvent {
 		const deltaY = nativeEvent.deltaY;
 
 		if (deltaY === 0) {
-			this.direction = deltaX < 0 ? "left" : "right";
+			this.direction = deltaX < 0 ? WheelDirection.left : WheelDirection.right;
 		} else {
-			this.direction = deltaY < 0 ? "up" : "down";
+			this.direction = deltaY < 0 ? WheelDirection.up : WheelDirection.down;
 		}
 	}
 }
+
 // #endif
 
-/** 事件名称到类型的映射 */
-export interface EventTypeMap {
-	onpointerclick : PointerclickEvent;
-	onpointerdown : PointerdownEvent;
-	onpointermove : PointermoveEvent;
-	onpointerup : PointerupEvent;
-	onpointercancel : PointercancelEvent;
-	// #ifndef APP-ANDROID
-	onpointerwheel : PointerwheelEvent;
-	// #endif
-}
+// #ifndef WEB
 
-export type EventType = "onpointerclick" | "onpointerdown" | "onpointermove" | "onpointerup" | "onpointercancel" | "onpointerwheel";
+import { PointerTarget, NativeEvent, EventType } from "./pointer-events-common.uts";
+
+// #endif
+
+export { PointerTarget, NativeEvent, EventType }
